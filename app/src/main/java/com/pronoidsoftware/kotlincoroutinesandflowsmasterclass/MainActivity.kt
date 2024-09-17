@@ -35,30 +35,31 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
-                var selectedBird by remember {
-                    mutableStateOf<Bird>(Bird.Bird1)
-                }
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        verticalArrangement = Arrangement.SpaceAround,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(selectedBird.name)
-                        Button(onClick = { selectedBird = Bird.Bird1 }) {
-                            Text(Bird.Bird1.name)
-                        }
-                        Button(onClick = { selectedBird = Bird.Bird2 }) {
-                            Text(Bird.Bird2.name)
-                        }
-                        Button(onClick = { selectedBird = Bird.Bird3 }) {
-                            Text(Bird.Bird3.name)
-                        }
-                        SelectedBird(selectedBird)
-                    }
-                }
+                AssignmentTwoScreen()
+//                var selectedBird by remember {
+//                    mutableStateOf<Bird>(Bird.Bird1)
+//                }
+//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+//                    Column(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .padding(innerPadding),
+//                        verticalArrangement = Arrangement.SpaceAround,
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                    ) {
+//                        Text(selectedBird.name)
+//                        Button(onClick = { selectedBird = Bird.Bird1 }) {
+//                            Text(Bird.Bird1.name)
+//                        }
+//                        Button(onClick = { selectedBird = Bird.Bird2 }) {
+//                            Text(Bird.Bird2.name)
+//                        }
+//                        Button(onClick = { selectedBird = Bird.Bird3 }) {
+//                            Text(Bird.Bird3.name)
+//                        }
+//                        SelectedBird(selectedBird)
+//                    }
+//                }
             }
         }
     }
