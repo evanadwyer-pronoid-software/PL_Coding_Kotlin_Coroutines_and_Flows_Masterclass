@@ -22,25 +22,29 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        GlobalScope.launch {
-            launch {
-                repeat(4) {
+        val birds = GlobalScope.launch {
+            val bird1 = launch {
+                while (true) {
                     println("Coo")
                     delay(1000L)
                 }
             }
-            launch {
-                repeat(4) {
+            val bird2 = launch {
+                while (true) {
                     println("Caw")
                     delay(2000L)
                 }
             }
-            launch {
-                repeat(4) {
+            val bird3 = launch {
+                while (true) {
                     println("Chirp")
                     delay(3000L)
                 }
             }
+            delay(10000L)
+            bird1.cancel()
+            bird2.cancel()
+            bird3.cancel()
         }
 
         setContent {
