@@ -22,9 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.ui.theme.KotlinCoroutinesAndFlowsMasterclassTheme
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,10 +68,14 @@ class MainActivity : ComponentActivity() {
 fun SelectedBird(
     selectedBird: Bird
 ) {
-    LaunchedEffect(selectedBird.name) {
-        while (true) {
-            println(selectedBird.song)
-            delay(selectedBird.frequency)
+    LaunchedEffect(
+        key1 = selectedBird.name
+    ) {
+        withContext(coroutineContext + CoroutineName(selectedBird.name)) {
+            while (true) {
+                println("${coroutineContext[CoroutineName]} says ${selectedBird.song}")
+                delay(selectedBird.frequency)
+            }
         }
     }
 }
@@ -79,7 +85,7 @@ sealed class Bird(
     val song: String,
     val frequency: Long
 ) {
-    data object Bird1 : Bird("Bird1", "Coo", 1000L)
-    data object Bird2 : Bird("Bird2", "Caw", 2000L)
-    data object Bird3 : Bird("Bird3", "Chirp", 3000L)
+    data object Bird1 : Bird("Tweety", "Coo", 1000L)
+    data object Bird2 : Bird("Zazu", "Caw", 2000L)
+    data object Bird3 : Bird("Woodstock", "Chirp", 3000L)
 }
