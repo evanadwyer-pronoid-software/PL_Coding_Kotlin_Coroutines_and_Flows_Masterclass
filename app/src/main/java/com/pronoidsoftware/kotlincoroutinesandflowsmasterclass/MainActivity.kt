@@ -21,6 +21,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.charity.MoneyTransferScreen
+import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.charity.MoneyTransferViewModel
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.ui.theme.KotlinCoroutinesAndFlowsMasterclassTheme
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +42,14 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
-                AssignmentOneScreen()
+                val viewModel: MoneyTransferViewModel = viewModel()
+                viewModel.applicationScope = (application as MyApplication).applicationScope
+
+                MoneyTransferScreen(
+                    state = viewModel.state,
+                    onAction = viewModel::onAction
+                )
+//                AssignmentOneScreen()
 //                AssignmentTwoScreen()
 //                var selectedBird by remember {
 //                    mutableStateOf<Bird>(Bird.Bird1)
