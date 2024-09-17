@@ -23,10 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.ui.theme.KotlinCoroutinesAndFlowsMasterclassTheme
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +39,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
-                AssignmentTwoScreen()
+                AssignmentOneScreen()
+//                AssignmentTwoScreen()
 //                var selectedBird by remember {
 //                    mutableStateOf<Bird>(Bird.Bird1)
 //                }
@@ -78,6 +83,15 @@ fun SelectedBird(
                 delay(selectedBird.frequency)
             }
         }
+    }
+}
+
+suspend fun test() {
+    delay(500L)
+    coroutineContext.ensureActive()
+    withContext(Dispatchers.IO) {
+        isActive
+        ensureActive()
     }
 }
 
