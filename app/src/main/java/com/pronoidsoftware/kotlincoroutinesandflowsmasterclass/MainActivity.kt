@@ -11,8 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,7 +30,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.auth.BiometricPromptManager
@@ -94,30 +101,28 @@ class MainActivity : AppCompatActivity() {
 //            EmailService.sendNewsletter()
 //            println("Done sending emails")
 //        }
-        val countdownFlow = flow<Int> {
-            (10 downTo 0).forEach {
-                emit(it)
-                delay(1000L)
-            }
-        }
 
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
-                var count by remember {
-                    mutableIntStateOf(10)
-                }
+                val viewModel = viewModel<MainViewModel>()
+                val initialAmount by viewModel.initialAmount.collectAsStateWithLifecycle()
+                val count by viewModel.count.collectAsStateWithLifecycle()
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    Text("Initial amount:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    BasicTextField(value = "$initialAmount", onValueChange = {
+                        viewModel.updateInitialAmount(if (it.isEmpty()) 0 else it.toInt())
+                    },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Number
+                        ))
                     Text(count.toString())
                     Button(onClick = {
-                        lifecycleScope.launch {
-                            countdownFlow
-                                .onEach { count = it }
-                                .collect()
-                        }
+                        viewModel.startCountdown()
                     }) {
                         Text("Start Countdown")
                     }
