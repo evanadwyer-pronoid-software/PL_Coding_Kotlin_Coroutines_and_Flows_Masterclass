@@ -1,3 +1,5 @@
+@file:OptIn(DelicateCoroutinesApi::class)
+
 package com.pronoidsoftware.kotlincoroutinesandflowsmasterclass
 
 import android.os.Bundle
@@ -34,6 +36,7 @@ import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.ui.theme.KotlinCo
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
@@ -42,11 +45,15 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
+import kotlin.random.Random
 
 private const val AUTHENTICATION_TIMEOUT_MILLIS = 3000L
 
@@ -86,50 +93,72 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
-                val context = LocalContext.current
-                var biometricsResult by remember {
-                    mutableStateOf<BiometricResult?>(null)
+
+//                 USE THIS TO RUN YOUR Leaderboard CLASS
+                val leaderboard = Leaderboard()
+
+
+                leaderboard.addListener { topScores: String ->
+                    println("New Top Scores:")
+                    println(topScores + "\n\n")
                 }
 
-                LaunchedEffect(biometricsResult) {
-                    if (biometricsResult != null) {
-                        Toast.makeText(context, biometricsResult.toString(), Toast.LENGTH_LONG).show()
-                        biometricsResult = null
-                    }
-                }
-
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Button(onClick = {
-                        lifecycleScope.launch {
+                LaunchedEffect(true) {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        (1..5_000).map { index ->
                             launch {
-                                val result = withTimeoutOrNull(AUTHENTICATION_TIMEOUT_MILLIS) {
-                                    try {
-                                        biometricsResult = promptManager.showBiometricPrompt(
-                                            title = "Authentication",
-                                            description = "Please authenticate to proceed"
-                                        )
-
-                                    } catch (e: Exception) {
-                                        if (e is CancellationException) {
-                                            Toast.makeText(context, "Cancelled", Toast.LENGTH_LONG).show()
-                                            throw e
-                                        }
-                                        e.printStackTrace()
-                                    }
-                                }
-                                if (result == null) {
-                                    println("Timeout reached, cancelling...")
-                                    lifecycleScope.cancelChildren()
-                                }
+                                val playerName = "Player $index"
+                                val playerScore = Random.nextInt(1, 10_0000)
+                                leaderboard.updateScore(playerName, playerScore)
                             }
-                        }
-                    }) {
-                        Text(text = "Authenticate")
+                        }.joinAll()
+                        println("Completed!")
                     }
                 }
+//                val context = LocalContext.current
+//                var biometricsResult by remember {
+//                    mutableStateOf<BiometricResult?>(null)
+//                }
+//
+//                LaunchedEffect(biometricsResult) {
+//                    if (biometricsResult != null) {
+//                        Toast.makeText(context, biometricsResult.toString(), Toast.LENGTH_LONG).show()
+//                        biometricsResult = null
+//                    }
+//                }
+//
+//                Box(
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentAlignment = Alignment.Center,
+//                ) {
+//                    Button(onClick = {
+//                        lifecycleScope.launch {
+//                            launch {
+//                                val result = withTimeoutOrNull(AUTHENTICATION_TIMEOUT_MILLIS) {
+//                                    try {
+//                                        biometricsResult = promptManager.showBiometricPrompt(
+//                                            title = "Authentication",
+//                                            description = "Please authenticate to proceed"
+//                                        )
+//
+//                                    } catch (e: Exception) {
+//                                        if (e is CancellationException) {
+//                                            Toast.makeText(context, "Cancelled", Toast.LENGTH_LONG).show()
+//                                            throw e
+//                                        }
+//                                        e.printStackTrace()
+//                                    }
+//                                }
+//                                if (result == null) {
+//                                    println("Timeout reached, cancelling...")
+//                                    lifecycleScope.cancelChildren()
+//                                }
+//                            }
+//                        }
+//                    }) {
+//                        Text(text = "Authenticate")
+//                    }
+//                }
 //                val viewModel: MoneyTransferViewModel = viewModel()
 //                viewModel.applicationScope = (application as MyApplication).applicationScope
 //
@@ -165,6 +194,34 @@ class MainActivity : AppCompatActivity() {
 //                }
             }
         }
+    }
+}
+
+private class Leaderboard {
+
+    private val scores = mutableMapOf<String, Int>()
+    private val mutex = Mutex()
+    private var top3Scores: String = ""
+    private val listeners = mutableListOf<(String) -> Unit>()
+
+    suspend fun updateScore(playerName: String, playerScore: Int) {
+        mutex.withLock {
+            scores[playerName] = playerScore
+            top3Scores = withContext(Dispatchers.Default) {
+                scores.entries
+                    .sortedByDescending { it.value }
+                    .take(3)
+                    .map { it.value }
+                    .joinToString { it.toString() }
+            }
+            listeners.forEach { listener ->
+                listener.invoke(top3Scores)
+            }
+        }
+    }
+
+    fun addListener(listener: (String) -> Unit) {
+        listeners.add(listener)
     }
 }
 
