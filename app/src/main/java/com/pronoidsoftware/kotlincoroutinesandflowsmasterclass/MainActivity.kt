@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,6 +45,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -90,31 +94,56 @@ class MainActivity : AppCompatActivity() {
 //            EmailService.sendNewsletter()
 //            println("Done sending emails")
 //        }
+        val countdownFlow = flow<Int> {
+            (10 downTo 0).forEach {
+                emit(it)
+                delay(1000L)
+            }
+        }
 
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
-
-//                 USE THIS TO RUN YOUR Leaderboard CLASS
-                val leaderboard = Leaderboard()
-
-
-                leaderboard.addListener { topScores: String ->
-                    println("New Top Scores:")
-                    println(topScores + "\n\n")
+                var count by remember {
+                    mutableIntStateOf(10)
                 }
-
-                LaunchedEffect(true) {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        (1..5_000).map { index ->
-                            launch {
-                                val playerName = "Player $index"
-                                val playerScore = Random.nextInt(1, 10_0000)
-                                leaderboard.updateScore(playerName, playerScore)
-                            }
-                        }.joinAll()
-                        println("Completed!")
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(count.toString())
+                    Button(onClick = {
+                        lifecycleScope.launch {
+                            countdownFlow
+                                .onEach { count = it }
+                                .collect()
+                        }
+                    }) {
+                        Text("Start Countdown")
                     }
                 }
+
+//                 USE THIS TO RUN YOUR Leaderboard CLASS
+//                val leaderboard = Leaderboard()
+//
+//
+//                leaderboard.addListener { topScores: String ->
+//                    println("New Top Scores:")
+//                    println(topScores + "\n\n")
+//                }
+//
+//                LaunchedEffect(true) {
+//                    GlobalScope.launch(Dispatchers.IO) {
+//                        (1..5_000).map { index ->
+//                            launch {
+//                                val playerName = "Player $index"
+//                                val playerScore = Random.nextInt(1, 10_0000)
+//                                leaderboard.updateScore(playerName, playerScore)
+//                            }
+//                        }.joinAll()
+//                        println("Completed!")
+//                    }
+//                }
 //                val context = LocalContext.current
 //                var biometricsResult by remember {
 //                    mutableStateOf<BiometricResult?>(null)
