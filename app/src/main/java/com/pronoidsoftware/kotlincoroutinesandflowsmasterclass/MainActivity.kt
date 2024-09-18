@@ -21,10 +21,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.charity.MoneyTransferScreen
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.charity.MoneyTransferViewModel
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.ui.theme.KotlinCoroutinesAndFlowsMasterclassTheme
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -40,15 +42,38 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+            throwable.printStackTrace()
+        }
+
+        lifecycleScope.launch(handler) {
+            EmailService.addToMailingList(
+                listOf(
+                    "dancing.dave@email.com",
+                    "caffeinated.coder@email.com",
+                    "bookworm.betty@email.com",
+                    "gardening.guru@email.com",
+                    "sleepy.slothemail.com",
+                    "hungry.hippo@email.com",
+                    "clueless.cathy@email.com",
+                    "techy.tom@email.com",
+                    "musical.maryemail.com",
+                    "adventurous.alice@email.com"
+                )
+            )
+            EmailService.sendNewsletter()
+            println("Done sending emails")
+        }
+
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
-                val viewModel: MoneyTransferViewModel = viewModel()
-                viewModel.applicationScope = (application as MyApplication).applicationScope
-
-                MoneyTransferScreen(
-                    state = viewModel.state,
-                    onAction = viewModel::onAction
-                )
+//                val viewModel: MoneyTransferViewModel = viewModel()
+//                viewModel.applicationScope = (application as MyApplication).applicationScope
+//
+//                MoneyTransferScreen(
+//                    state = viewModel.state,
+//                    onAction = viewModel::onAction
+//                )
 //                AssignmentOneScreen()
 //                AssignmentTwoScreen()
 //                var selectedBird by remember {
