@@ -2,6 +2,10 @@
 
 package com.pronoidsoftware.kotlincoroutinesandflowsmasterclass
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -47,14 +51,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -70,13 +82,13 @@ private const val AUTHENTICATION_TIMEOUT_MILLIS = 3000L
 
 class MainActivity : AppCompatActivity() {
 
-    private val promptManager by lazy {
-        BiometricPromptManager(this)
-    }
+//    private val promptManager by lazy {
+//        BiometricPromptManager(this)
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        BiometricPromptManager(this)
+//        BiometricPromptManager(this)
         enableEdgeToEdge()
 
 //        val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
@@ -105,28 +117,33 @@ class MainActivity : AppCompatActivity() {
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
                 val viewModel = viewModel<MainViewModel>()
-                val initialAmount by viewModel.initialAmount.collectAsStateWithLifecycle()
-                val count by viewModel.count.collectAsStateWithLifecycle()
+                viewModel.connectivityManager =
+                    this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val connected by viewModel.connected.collectAsStateWithLifecycle()
+//                val initialAmount by viewModel.initialAmount.collectAsStateWithLifecycle()
+//                val count by viewModel.count.collectAsStateWithLifecycle()
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("Initial amount:")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    BasicTextField(value = "$initialAmount", onValueChange = {
-                        viewModel.updateInitialAmount(if (it.isEmpty()) 0 else it.toInt())
-                    },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number
-                        ))
-                    Text(count.toString())
-                    Button(onClick = {
-                        viewModel.startCountdown()
-                    }) {
-                        Text("Start Countdown")
-                    }
+                    Text("Connected: $connected")
                 }
+//                    Text("Initial amount:")
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    BasicTextField(value = "$initialAmount", onValueChange = {
+//                        viewModel.updateInitialAmount(if (it.isEmpty()) 0 else it.toInt())
+//                    },
+//                        keyboardOptions = KeyboardOptions.Default.copy(
+//                            keyboardType = KeyboardType.Number
+//                        ))
+//                    Text(count.toString())
+//                    Button(onClick = {
+//                        viewModel.startCountdown()
+//                    }) {
+//                        Text("Start Countdown")
+//                    }
+//                }
 
 //                 USE THIS TO RUN YOUR Leaderboard CLASS
 //                val leaderboard = Leaderboard()
