@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.assignment1042.SearchScreen
+import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.assignment1042.SearchViewModel
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.auth.BiometricPromptManager
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.auth.BiometricResult
 import com.pronoidsoftware.kotlincoroutinesandflowsmasterclass.charity.MoneyTransferScreen
@@ -116,19 +118,25 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             KotlinCoroutinesAndFlowsMasterclassTheme {
-                val viewModel = viewModel<MainViewModel>()
-                viewModel.connectivityManager =
-                    this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                val connected by viewModel.connected.collectAsStateWithLifecycle()
-//                val initialAmount by viewModel.initialAmount.collectAsStateWithLifecycle()
-//                val count by viewModel.count.collectAsStateWithLifecycle()
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text("Connected: $connected")
-                }
+                val viewModel: SearchViewModel = viewModel()
+                val state by viewModel.state.collectAsStateWithLifecycle()
+                SearchScreen(
+                    state = state,
+                    onSearchTextChange = viewModel::onSearchQueryChange
+                )
+//                val viewModel = viewModel<MainViewModel>()
+//                viewModel.connectivityManager =
+//                    this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+//                val connected by viewModel.connected.collectAsStateWithLifecycle()
+////                val initialAmount by viewModel.initialAmount.collectAsStateWithLifecycle()
+////                val count by viewModel.count.collectAsStateWithLifecycle()
+//                Column(
+//                    modifier = Modifier.fillMaxSize(),
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                ) {
+//                    Text("Connected: $connected")
+//                }
 //                    Text("Initial amount:")
 //                    Spacer(modifier = Modifier.height(8.dp))
 //                    BasicTextField(value = "$initialAmount", onValueChange = {
