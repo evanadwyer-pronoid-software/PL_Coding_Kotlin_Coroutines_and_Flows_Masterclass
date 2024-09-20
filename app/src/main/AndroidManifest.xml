@@ -19,7 +19,7 @@
         android:theme="@style/Theme.KotlinCoroutinesAndFlowsMasterclass"
         tools:targetApi="31">
         <activity
-            android:name=".assignment882.Assignment882Screen"
+            android:name=".assignment982.Assignment982Screen"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.KotlinCoroutinesAndFlowsMasterclass">

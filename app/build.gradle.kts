@@ -56,6 +56,8 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.appcompat)
 
+    implementation(libs.google.android.gms.play.services.location)
+
     implementation(libs.androidx.compose.navigation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

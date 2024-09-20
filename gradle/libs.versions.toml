@@ -17,6 +17,7 @@ appcompat = "1.7.0"
 coroutines-test = "1.8.1"
 assertk = "0.28.1"
 turbine = "1.1.0"
+gmsLocation = "21.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version = "2.7.0" 
 androidx-compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref= "navigationCompose"}
 androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+google-android-gms-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "gmsLocation"}
 
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
